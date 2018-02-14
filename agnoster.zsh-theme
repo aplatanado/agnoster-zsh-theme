@@ -99,7 +99,7 @@ prompt_git() {
       ref="$DETACHED ${ref/.../}"
     fi
     prompt_segment $color $PRIMARY_FG
-    print -n " $ref"
+    print -Pn " $ref"
   fi
 }
 
@@ -124,10 +124,10 @@ prompt_status() {
 
 # Display current virtual environment
 prompt_virtualenv() {
-  if [[ -n $VIRTUAL_ENV ]]; then
+  if [[ -n $python_info[virtualenv] ]]; then
     color=cyan
     prompt_segment $color $PRIMARY_FG
-    print -Pn " $(basename $VIRTUAL_ENV) "
+    print -Pn " $(basename $python_info[virtualenv]) "
   fi
 }
 
@@ -145,6 +145,12 @@ prompt_agnoster_main() {
 
 prompt_agnoster_precmd() {
   vcs_info
+
+  # Get Python environment information.
+  if (( $+functions[python-info] )); then
+    python-info
+  fi
+
   PROMPT='%{%f%b%k%}$(prompt_agnoster_main) '
 }
 
@@ -160,6 +166,9 @@ prompt_agnoster_setup() {
   zstyle ':vcs_info:*' check-for-changes false
   zstyle ':vcs_info:git*' formats '%b'
   zstyle ':vcs_info:git*' actionformats '%b (%a)'
+
+  # %v - virtualenv name.
+  zstyle ':prezto:module:python:info:virtualenv' format '%v'
 }
 
 prompt_agnoster_setup "$@"
